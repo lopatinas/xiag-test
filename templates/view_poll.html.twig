@@ -1,0 +1,72 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <div class="poll">
+        <h1>{{ poll.question }}</h1>
+        {% if not hasAnswer %}
+            <form method="post">
+                <div class="ex2-question">
+                    <div class="ex2-question__label">Your name:</div>
+                    <div class="ex2-question__input">
+                        <input name="name" id="name" type="text" class="input-text" required="required">
+                    </div>
+                    <div class="ex2-question__answer">
+                        {% for answer in poll.answers %}
+                            <label for="answer_{{ answer.id }}"><input type="radio" name="answer_id" id="answer_{{ answer.id }}" value="{{ answer.id }}" required="required">{{ answer.answer }}</label>
+                        {% endfor %}
+                    </div>
+                    <div class="ex2-question__submit">
+                        <input type="submit" class="btn" value="Submit">
+                    </div>
+                </div>
+            </form>
+            <h1>Results</h1>
+        {% endif %}
+        <br>
+        <table class="ex2-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                {% for answer in poll.answers %}
+                    <th>{{ answer.answer }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in results %}
+                <tr>
+                    <td>{{ result.name }}</td>
+                    {% for answer in poll.answers %}
+                        <td>{% if answer.id == result.answerId %}x{% endif %}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            let answers = JSON.parse('{{ answerIds|json_encode }}'),
+                conn = new WebSocket('ws://localhost:8080/poll/{{ poll.slug }}');
+
+            conn.onopen = function(e) {
+                console.log("Connection established!");
+            }
+
+            conn.onmessage = function(e) {
+                let data = JSON.parse(e.data),
+                row = '<tr><td>' + data.name + '</td>';
+                answers.forEach(function (answerId) {
+                    if (answerId === data.answerId) {
+                        row += '<td>x</td>';
+                    } else {
+                        row += '<td></td>';
+                    }
+                })
+                row += '</tr>';
+                $('table.ex2-table tbody').append(row);
+            };
+        });
+    </script>
+{% endblock %}

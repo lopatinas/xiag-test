@@ -1,0 +1,51 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <div class="poll">
+        <form method="post">
+            <table class="poll-table">
+                <thead>
+                <tr>
+                    <th>Question:</th>
+                    <th>
+                        <input id="question" name="question" required="required" type="text" value="Where do we go out tonight?" class="input-text">
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="answer">
+                    <th>Answer 1:</th>
+                    <td>
+                        <input id="answer_1" name="answers[]" type="text" value="Yes" class="input-text">
+                    </td>
+                </tr>
+                <tr class="answer">
+                    <th>Answer 2:</th>
+                    <td>
+                        <input id="answer_2" name="answers[]"  type="text" value="No" class="input-text">
+                    </td>
+                </tr>
+                <tr class="add-answer">
+                    <td class="poll-table__plus">
+                        <button id="add_answer" class="btn btn--plus">+</button>
+                    </td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <button class="btn btn--start">Start</button>
+        </form>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#add_answer').on('click', function (e) {
+                e.preventDefault();
+                let answerId = $('tr.answer').length + 1;
+
+                $('tr.add-answer').before('<tr class="answer"><th>Answer ' + answerId + ':</th><td><input id="answer_' + answerId + '" name="answers[]"  type="text" value="" class="input-text"></td></tr>')
+            });
+        });
+    </script>
+{% endblock %}
